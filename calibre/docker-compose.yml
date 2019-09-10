@@ -1,0 +1,16 @@
+---
+version: "2"
+services:
+  calibre:
+    image: linuxserver/calibre
+    container_name: calibre
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Buenos_Aires
+    volumes:
+      - /srv/calibre:/config
+    ports:
+      - 8080:8080
+      - 8081:8081
+    restart: unless-stopped

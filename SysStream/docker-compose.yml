@@ -1,0 +1,134 @@
+---
+version: "3"
+services:
+
+  transmission:
+    image: linuxserver/transmission
+    container_name: transmission
+    networks:
+      - backend
+    environment:
+      - PUID=1000
+      - PGIF=1000
+      - TZ=America/Buenos_Aires
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:transmission.home.local" # Domain name for the app
+    volumes:
+      - /srv/transmission:/config #Configuración de la Aplicación
+      - /home/fran/downloads:/downloads #Carpeta donde se descargan los torrents
+      - /srv/watch:/watch #Opcional: Carpeta donde busca .torrent para descarga automática
+    ports:
+      - 9091:9091  #Interfaz de administración - Personalizar el json de config.
+      - 51413:51413
+      - 51413:51413/udp
+    restart: unless-stopped
+
+  jackett:
+    image: linuxserver/jackett
+    container_name: jackett
+    networks:
+      - backend
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Buenos_Aires
+      - RUN_OPTS=run options here #optional
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:jackett.home.local" # Domain name for the app
+    volumes:
+      - /srv/jackett:/config #Configuración de la Aplicación
+      - /srv/watch:/downloads #Opcional: Carpeta donde deja .torrent para descarga automática
+    ports:
+      - 9117:9117 #Interfaz de administración
+    restart: unless-stopped
+
+  sonarr:
+    image: linuxserver/sonarr
+    container_name: sonarr
+    networks:
+      - backend
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Buenos_Aires
+      - UMASK_SET=022 #optional
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:sonarr.home.local" # Domain name for the app
+    volumes:
+      - /srv/sonarr:/config #Configuración de la Aplicación.
+      - /home/fran/tv:/tv #Carpeta donde mueve las descargas finalizadas, para indexar y bajar adicionales
+      - /home/fran/downloads/:/downloads #Carpeta donde monitorea la descara de torrents.
+    ports:
+      - 8989:8989 #Interfaz de administración
+    restart: unless-stopped
+
+  emby:
+    image: linuxserver/emby
+    container_name: emby
+    networks:
+      - backend
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Buenos_Aires
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:emby.home.local" # Domain name for the app
+    volumes:
+      - /srv/emby:/config #Configuración de la Aplicación
+      - /home/fran/tv:/data/tvshows #Carpeta donde están las Series de Televisión indexadas por Sonarr
+      - /home/fran/movies:/data/movies #Carpeta donde está las Pelícuals indexadas por Radarr
+    ports:
+      - 18096:8096 #Interfaz de Administración
+      - 18920:8920 #Interfaz de Administración SSL
+    restart: unless-stopped
+
+  radarr:                                     #Mantiene la información relacionada a Películas
+    image: linuxserver/radarr
+    hostname: radarr
+    container_name: radarr
+    networks:
+      - backend
+    environment:
+      - PUID=1000
+      - GUID=1000
+      - TZ=America/Buenos_Aires
+      - UMASK_SET=022                         #optional
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:radarr.home.local" # Domain name for the app
+    volumes:
+      - /srv/radarr:/config                   #Configuración de la Aplicación
+      - /home/fran/movies:/movies        #Carpeta donde mueve las descargas finalizadas, para indexar y bajar adicionales
+      - /home/fran/downloads/complete:/downloads   #Carpeta donde monitroea la descarga de torrents.
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  bazarr:
+    image: linuxserver/bazarr
+    container_name: bazarr
+    networks:
+      - backend
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Buenos_Aires
+      - UMASK_SET=022 #optional
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:bazarr.home.local" # Domain name for the app
+    volumes:
+      - /srv/bazarr/config:/config
+      - /home/fran/movies:/movies
+      - /home/fran/tv:/tv
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+
+networks:
+  backend:  
+    external: true

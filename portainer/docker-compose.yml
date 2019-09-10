@@ -1,0 +1,25 @@
+---
+version: "3"
+services:
+
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.port=9000" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:portainer.home.local" # Domain name for the app
+    networks:
+      - backend
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /srv/portainer:/data
+    ports:
+      - 8000:8000
+      - 9000:9000
+    restart: unless-stopped
+  
+networks:
+  backend:
+    external: true
+

@@ -1,0 +1,31 @@
+InsecureSkipVerify = true
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+[entryPoints.https]
+  address = ":443"
+[entryPoints.https.tls]
+[retry]
+
+[api]
+ entryPoint = "traefik"
+ dashboard = true
+ [api.statistics]
+ recentErrors = 10
+
+[docker]
+ domain = "home.local"
+ watch = true
+ exposedbydefault = false
+
+# Enable ACME (Let's Encrypt): automatic SSL
+#[acme]
+# email = "YOUR_EMAIL@ADDRESS"
+# storage = "acme.json" # or "traefik/acme/account" if using KV store
+# acmeLogging = true
+# entryPoint = "https"
+# OnHostRule = false
+#[acme.dnsChallenge]
+# provider = "cloudflare"
+#[[acme.domains]]
+# main = "your_app.your_domain"
