@@ -1,0 +1,26 @@
+version: '3'
+services:
+  netdata:
+    image: netdata/netdata
+    hostname: stats.home.local # set to fqdn of host
+    networks:
+      - backend
+    # ports:
+    #  - 19999:19999
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.port=19999" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:stats.home.local" # Domain name for the app
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+networks:
+  backend:
+    external: true
+
