@@ -18,6 +18,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # So that Traefik can listen to the Docker events
       - ./conf/traefik.toml:/traefik.toml # Traefik configuration file
+    restart: unless-stopped
 
 networks:
   backend:  
