@@ -1,0 +1,24 @@
+---
+version: "2.1"
+services:
+  heimdall:
+    image: linuxserver/heimdall
+    container_name: heimdall
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Argentina/Buenos_Aires
+    volumes:
+      - /home/fran/docker/dashboard/config:/config
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.port=80" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:dashboard.home.local" # Domain name for the app
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true
+
