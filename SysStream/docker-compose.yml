@@ -104,8 +104,6 @@ services:
       - /mnt/usbdisk/srv/radarr:/config                   #Configuración de la Aplicación
       - /mnt/usbdisk/Peliculas:/Peliculas        #Carpeta donde mueve las descargas finalizadas, para indexar y bajar adicionales
       - /home/fran/downloads/:/downloads   #Carpeta donde monitroea la descarga de torrents.
-#    ports:
-#      - 7878:7878
     restart: unless-stopped
 
   bazarr:
@@ -128,6 +126,23 @@ services:
       - /mnt/usbdisk/Series:/tv
     ports:
       - 6767:6767
+    restart: unless-stopped
+
+  mylar:
+    image: linuxserver/mylar
+    container_name: mylar
+    environment:
+      - PUID=1000
+      - PGID=1000
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:mylar.home.local" # Domain name for the app
+    volumes:
+      - /mnt/usbdisk/srv/mylar/config:/config
+      - /mnt/usbdisk/Comics:/comics
+      - /home/fran/downloads/:/downloads   #Carpeta donde monitroea la descarga de torrents.
+    ports:
+      - 8090:8090
     restart: unless-stopped
 
 networks:

@@ -1,0 +1,31 @@
+---
+version: '3.3'
+services:
+  komga:
+    image: gotson/komga
+    container_name: komga
+    labels:
+      - "traefik.enable=true" # Enable reverse-proxy for this service
+      - "traefik.port=8080" # Enable reverse-proxy for this service
+      - "traefik.frontend.rule=Host:comics.home.local" # Domain name for the app
+    volumes:
+      - type: bind
+        source: /mnt/usbdisk/srv/komga
+        target: /config
+      - type: bind
+        source: /mnt/usbdisk/Comics
+        target: /books
+      - type: bind
+        source: /etc/timezone
+        target: /etc/timezone
+        read_only: true
+    ports:
+      - 8686:8080
+    user: "1000:1000"
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  backend:
+    external: true
